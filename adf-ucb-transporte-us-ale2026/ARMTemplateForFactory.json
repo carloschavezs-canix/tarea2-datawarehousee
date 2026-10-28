@@ -1200,6 +1200,261 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/dataflows/df_bronze_paradas')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ds_dw_bronze_vehiculos')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "ls_sql_dw",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [
+					{
+						"name": "AnioFuente",
+						"type": "varchar"
+					},
+					{
+						"name": "VehiculoId",
+						"type": "varchar"
+					},
+					{
+						"name": "Placa",
+						"type": "varchar"
+					},
+					{
+						"name": "TipoVehiculo",
+						"type": "varchar"
+					},
+					{
+						"name": "CapacidadEfectiva",
+						"type": "varchar"
+					},
+					{
+						"name": "VigenciaDesde",
+						"type": "varchar"
+					},
+					{
+						"name": "VigenciaHasta",
+						"type": "varchar"
+					},
+					{
+						"name": "Estado",
+						"type": "varchar"
+					}
+				],
+				"typeProperties": {
+					"schema": "bronze",
+					"table": "VehiculosAzure"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ls_sql_dw')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/df_bronze_vehiculos')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"folder": {
+					"name": "bronze"
+				},
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "ds_csv_vehiculos",
+								"type": "DatasetReference"
+							},
+							"name": "csv"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_sql_vehiculos",
+								"type": "DatasetReference"
+							},
+							"name": "sql"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_xlsx_vehiculos_2022",
+								"type": "DatasetReference"
+							},
+							"name": "xls2022"
+						},
+						{
+							"dataset": {
+								"referenceName": "ds_xlsx_vehiculos_2023",
+								"type": "DatasetReference"
+							},
+							"name": "xls2023"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "ds_dw_bronze_vehiculos",
+								"type": "DatasetReference"
+							},
+							"name": "sinkVehiculos"
+						}
+					],
+					"transformations": [
+						{
+							"name": "selcsv"
+						},
+						{
+							"name": "selxls2022"
+						},
+						{
+							"name": "selxls2023"
+						},
+						{
+							"name": "txtsql"
+						},
+						{
+							"name": "txtxls2022"
+						},
+						{
+							"name": "txtxls2023"
+						},
+						{
+							"name": "unionVehiculos"
+						}
+					],
+					"scriptLines": [
+						"source(output(",
+						"          nro_bus as string,",
+						"          placa as string,",
+						"          tipo_bus as string,",
+						"          capacidad as string,",
+						"          fecha_desde as string,",
+						"          fecha_hasta as string,",
+						"          estado as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> csv",
+						"source(output(",
+						"          AnioFuente as integer,",
+						"          VehiculoId as string,",
+						"          Placa as string,",
+						"          TipoVehiculo as string,",
+						"          CapacidadEfectiva as integer,",
+						"          VigenciaDesde as date,",
+						"          VigenciaHasta as date,",
+						"          Estado as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     isolationLevel: 'READ_UNCOMMITTED',",
+						"     format: 'table') ~> sql",
+						"source(output(",
+						"          nro_bus as string,",
+						"          placa as string,",
+						"          tipo_bus as string,",
+						"          capacidad as string,",
+						"          fecha_desde as string,",
+						"          fecha_hasta as string,",
+						"          estado as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> xls2022",
+						"source(output(",
+						"          nro_bus as string,",
+						"          placa as string,",
+						"          tipo_bus as string,",
+						"          capacidad as string,",
+						"          fecha_desde as string,",
+						"          fecha_hasta as string,",
+						"          estado as string",
+						"     ),",
+						"     allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     ignoreNoFilesFound: false) ~> xls2023",
+						"csv select(mapColumn(",
+						"          VehiculoId = nro_bus,",
+						"          Placa = placa,",
+						"          TipoVehiculo = tipo_bus,",
+						"          CapacidadEfectiva = capacidad,",
+						"          VigenciaDesde = fecha_desde,",
+						"          VigenciaHasta = fecha_hasta,",
+						"          Estado = estado",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selcsv",
+						"xls2022 select(mapColumn(",
+						"          VehiculoId = nro_bus,",
+						"          Placa = placa,",
+						"          TipoVehiculo = tipo_bus,",
+						"          CapacidadEfectiva = capacidad,",
+						"          VigenciaDesde = fecha_desde,",
+						"          VigenciaHasta = fecha_hasta,",
+						"          Estado = estado",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selxls2022",
+						"xls2023 select(mapColumn(",
+						"          VehiculoId = nro_bus,",
+						"          Placa = placa,",
+						"          TipoVehiculo = tipo_bus,",
+						"          CapacidadEfectiva = capacidad,",
+						"          VigenciaDesde = fecha_desde,",
+						"          VigenciaHasta = fecha_hasta,",
+						"          Estado = estado",
+						"     ),",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true) ~> selxls2023",
+						"sql derive(VehiculoId = toString(VehiculoId),",
+						"          CapacidadEfectiva = toString(CapacidadEfectiva),",
+						"          VigenciaDesde = toString(VigenciaDesde),",
+						"          VigenciaHasta = toString(VigenciaHasta)) ~> txtsql",
+						"selxls2022 derive(VehiculoId = toString(VehiculoId),",
+						"          CapacidadEfectiva = toString(CapacidadEfectiva),",
+						"          VigenciaDesde = toString(VigenciaDesde),",
+						"          VigenciaHasta = toString(VigenciaHasta)) ~> txtxls2022",
+						"selxls2023 derive(VehiculoId = toString(VehiculoId),",
+						"          CapacidadEfectiva = toString(CapacidadEfectiva),",
+						"          VigenciaDesde = toString(VigenciaDesde),",
+						"          VigenciaHasta = toString(VigenciaHasta)) ~> txtxls2023",
+						"selcsv, txtsql, txtxls2022, txtxls2023 union(byName: true)~> unionVehiculos",
+						"unionVehiculos sink(allowSchemaDrift: true,",
+						"     validateSchema: false,",
+						"     input(",
+						"          AnioFuente as string,",
+						"          VehiculoId as string,",
+						"          Placa as string,",
+						"          TipoVehiculo as string,",
+						"          CapacidadEfectiva as string,",
+						"          VigenciaDesde as string,",
+						"          VigenciaHasta as string,",
+						"          Estado as string",
+						"     ),",
+						"     deletable:false,",
+						"     insertable:true,",
+						"     updateable:false,",
+						"     upsertable:false,",
+						"     truncate:true,",
+						"     format: 'table',",
+						"     skipDuplicateMapInputs: true,",
+						"     skipDuplicateMapOutputs: true,",
+						"     errorHandlingOption: 'stopOnFirstError') ~> sinkVehiculos"
+					]
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/ds_csv_vehiculos')]",
+				"[concat(variables('factoryId'), '/datasets/ds_sql_vehiculos')]",
+				"[concat(variables('factoryId'), '/datasets/ds_xlsx_vehiculos_2022')]",
+				"[concat(variables('factoryId'), '/datasets/ds_xlsx_vehiculos_2023')]",
+				"[concat(variables('factoryId'), '/datasets/ds_dw_bronze_vehiculos')]"
+			]
 		}
 	]
 }
