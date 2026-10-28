@@ -46,6 +46,9 @@
 				},
 				{
 					"name": "selxls2023"
+				},
+				{
+					"name": "unionParadas"
 				}
 			],
 			"scriptLines": [
@@ -139,7 +142,8 @@
 				"          Estado = estado",
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> selxls2023"
+				"     skipDuplicateMapOutputs: true) ~> selxls2023",
+				"selcsv, sql, selxls2022, selxls2023 union(byName: true)~> unionParadas"
 			]
 		}
 	}
