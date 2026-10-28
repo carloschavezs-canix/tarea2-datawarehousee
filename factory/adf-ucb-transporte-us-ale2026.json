@@ -1,0 +1,10 @@
+{
+	"name": "adf-ucb-transporte-us-ale2026",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "eastus"
+}
