@@ -1,0 +1,57 @@
+{
+	"name": "ds_csv_paradas",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_datalake",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "paradas.csv",
+				"folderPath": "datos_csv",
+				"fileSystem": "raw"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "nro_parada",
+				"type": "String"
+			},
+			{
+				"name": "nombre_parada",
+				"type": "String"
+			},
+			{
+				"name": "zona",
+				"type": "String"
+			},
+			{
+				"name": "latitud",
+				"type": "String"
+			},
+			{
+				"name": "longitud",
+				"type": "String"
+			},
+			{
+				"name": "fecha_desde",
+				"type": "String"
+			},
+			{
+				"name": "fecha_hasta",
+				"type": "String"
+			},
+			{
+				"name": "estado",
+				"type": "String"
+			}
+		]
+	}
+}
