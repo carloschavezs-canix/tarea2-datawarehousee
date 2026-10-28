@@ -60,6 +60,12 @@
 				},
 				{
 					"name": "txtsql"
+				},
+				{
+					"name": "txtxls2022"
+				},
+				{
+					"name": "txtxls2023"
 				}
 			],
 			"scriptLines": [
@@ -159,6 +165,14 @@
 				"          Longitud = toString(Longitud),",
 				"          VigenciaDesde = toString(VigenciaDesde),",
 				"          VigenciaHasta = toString(VigenciaHasta)) ~> txtsql",
+				"selxls2022 derive(Latitud = toString(Latitud),",
+				"          Longitud = toString(Longitud),",
+				"          VigenciaDesde = toString(VigenciaDesde),",
+				"          VigenciaHasta = toString(VigenciaHasta)) ~> txtxls2022",
+				"selxls2023 derive(Latitud = toString(Latitud),",
+				"          Longitud = toString(Longitud),",
+				"          VigenciaDesde = toString(VigenciaDesde),",
+				"          VigenciaHasta = toString(VigenciaHasta)) ~> txtxls2023",
 				"unionParadas sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
