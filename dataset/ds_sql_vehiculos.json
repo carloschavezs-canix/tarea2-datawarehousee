@@ -1,0 +1,51 @@
+{
+	"name": "ds_sql_vehiculos",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "ls_sql_erp",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "AnioFuente",
+				"type": "smallint",
+				"precision": 5
+			},
+			{
+				"name": "VehiculoId",
+				"type": "nvarchar"
+			},
+			{
+				"name": "Placa",
+				"type": "nvarchar"
+			},
+			{
+				"name": "TipoVehiculo",
+				"type": "nvarchar"
+			},
+			{
+				"name": "CapacidadEfectiva",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "VigenciaDesde",
+				"type": "date"
+			},
+			{
+				"name": "VigenciaHasta",
+				"type": "date"
+			},
+			{
+				"name": "Estado",
+				"type": "nvarchar"
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "VehiculosAzure"
+		}
+	}
+}
