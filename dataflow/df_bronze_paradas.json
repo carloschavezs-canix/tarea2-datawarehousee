@@ -57,6 +57,9 @@
 				},
 				{
 					"name": "unionParadas"
+				},
+				{
+					"name": "txtsql"
 				}
 			],
 			"scriptLines": [
@@ -151,7 +154,11 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> selxls2023",
-				"selcsv, sql, selxls2022, selxls2023 union(byName: true)~> unionParadas",
+				"selcsv, txtsql, selxls2022, selxls2023 union(byName: true)~> unionParadas",
+				"sql derive(Latitud = toString(Latitud),",
+				"          Longitud = toString(Longitud),",
+				"          VigenciaDesde = toString(VigenciaDesde),",
+				"          VigenciaHasta = toString(VigenciaHasta)) ~> txtsql",
 				"unionParadas sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
