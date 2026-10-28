@@ -1,0 +1,95 @@
+{
+	"name": "df_bronze_vehiculos",
+	"properties": {
+		"folder": {
+			"name": "bronze"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_csv_vehiculos",
+						"type": "DatasetReference"
+					},
+					"name": "csv"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sql_vehiculos",
+						"type": "DatasetReference"
+					},
+					"name": "sql"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_xlsx_vehiculos_2022",
+						"type": "DatasetReference"
+					},
+					"name": "xls2022"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_xlsx_vehiculos_2023",
+						"type": "DatasetReference"
+					},
+					"name": "xls2023"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          nro_bus as string,",
+				"          placa as string,",
+				"          tipo_bus as string,",
+				"          capacidad as string,",
+				"          fecha_desde as string,",
+				"          fecha_hasta as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> csv",
+				"source(output(",
+				"          AnioFuente as integer,",
+				"          VehiculoId as string,",
+				"          Placa as string,",
+				"          TipoVehiculo as string,",
+				"          CapacidadEfectiva as integer,",
+				"          VigenciaDesde as date,",
+				"          VigenciaHasta as date,",
+				"          Estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sql",
+				"source(output(",
+				"          nro_bus as string,",
+				"          placa as string,",
+				"          tipo_bus as string,",
+				"          capacidad as string,",
+				"          fecha_desde as string,",
+				"          fecha_hasta as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> xls2022",
+				"source(output(",
+				"          nro_bus as string,",
+				"          placa as string,",
+				"          tipo_bus as string,",
+				"          capacidad as string,",
+				"          fecha_desde as string,",
+				"          fecha_hasta as string,",
+				"          estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> xls2023"
+			]
+		}
+	}
+}
