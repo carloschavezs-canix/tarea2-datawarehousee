@@ -1,0 +1,110 @@
+{
+	"name": "df_bronze_viajes",
+	"properties": {
+		"folder": {
+			"name": "bronze"
+		},
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_csv_viajes",
+						"type": "DatasetReference"
+					},
+					"name": "csv"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_sql_viajes",
+						"type": "DatasetReference"
+					},
+					"name": "sql"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_xlsx_viajes_2022",
+						"type": "DatasetReference"
+					},
+					"name": "xls2022"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_xlsx_viajes_2023",
+						"type": "DatasetReference"
+					},
+					"name": "xls2023"
+				}
+			],
+			"sinks": [],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          id_viaje as string,",
+				"          cod_ruta as string,",
+				"          nro_bus as string,",
+				"          fec_servicio as string,",
+				"          hora_programada as string,",
+				"          hora_salida as string,",
+				"          hora_llegada as string,",
+				"          pasajeros_reportados as string,",
+				"          km_recorridos as string,",
+				"          estado_viaje as string,",
+				"          tipo_metrica as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> csv",
+				"source(output(",
+				"          AnioFuente as integer,",
+				"          ViajeId as string,",
+				"          RutaHistoricaId as string,",
+				"          VehiculoId as string,",
+				"          FechaServicio as date,",
+				"          HoraProgramada as timestamp,",
+				"          HoraSalida as timestamp,",
+				"          HoraLlegada as timestamp,",
+				"          ValidacionesTarjeta as integer,",
+				"          KmRecorridos as decimal(8,1),",
+				"          EstadoViaje as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> sql",
+				"source(output(",
+				"          id_viaje as string,",
+				"          cod_ruta as string,",
+				"          nro_bus as string,",
+				"          fecha_servicio as string,",
+				"          hora_programada as string,",
+				"          hora_salida as string,",
+				"          hora_llegada as string,",
+				"          pasajeros_estimados as string,",
+				"          km_recorridos as string,",
+				"          estado_viaje as string,",
+				"          tipo_metrica as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> xls2022",
+				"source(output(",
+				"          id_viaje as string,",
+				"          cod_ruta as string,",
+				"          nro_bus as string,",
+				"          fecha_servicio as string,",
+				"          hora_programada as string,",
+				"          hora_salida as string,",
+				"          hora_llegada as string,",
+				"          pasajeros_estimados as string,",
+				"          km_recorridos as string,",
+				"          estado_viaje as string,",
+				"          tipo_metrica as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false) ~> xls2023"
+			]
+		}
+	}
+}
