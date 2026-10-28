@@ -160,7 +160,7 @@
 				"     ),",
 				"     skipDuplicateMapInputs: true,",
 				"     skipDuplicateMapOutputs: true) ~> selxls2023",
-				"selcsv, txtsql, selxls2022, selxls2023 union(byName: true)~> unionParadas",
+				"selcsv, txtsql, txtxls2022, txtxls2023 union(byName: true)~> unionParadas",
 				"sql derive(Latitud = toString(Latitud),",
 				"          Longitud = toString(Longitud),",
 				"          VigenciaDesde = toString(VigenciaDesde),",
