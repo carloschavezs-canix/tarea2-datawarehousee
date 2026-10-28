@@ -36,8 +36,38 @@
 					"name": "xls2023"
 				}
 			],
-			"sinks": [],
-			"transformations": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_dw_bronze_vehiculos",
+						"type": "DatasetReference"
+					},
+					"name": "sinkVehiculos"
+				}
+			],
+			"transformations": [
+				{
+					"name": "selcsv"
+				},
+				{
+					"name": "selxls2022"
+				},
+				{
+					"name": "selxls2023"
+				},
+				{
+					"name": "txtsql"
+				},
+				{
+					"name": "txtxls2022"
+				},
+				{
+					"name": "txtxls2023"
+				},
+				{
+					"name": "unionVehiculos"
+				}
+			],
 			"scriptLines": [
 				"source(output(",
 				"          nro_bus as string,",
@@ -88,7 +118,74 @@
 				"     ),",
 				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false) ~> xls2023"
+				"     ignoreNoFilesFound: false) ~> xls2023",
+				"csv select(mapColumn(",
+				"          VehiculoId = nro_bus,",
+				"          Placa = placa,",
+				"          TipoVehiculo = tipo_bus,",
+				"          CapacidadEfectiva = capacidad,",
+				"          VigenciaDesde = fecha_desde,",
+				"          VigenciaHasta = fecha_hasta,",
+				"          Estado = estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selcsv",
+				"xls2022 select(mapColumn(",
+				"          VehiculoId = nro_bus,",
+				"          Placa = placa,",
+				"          TipoVehiculo = tipo_bus,",
+				"          CapacidadEfectiva = capacidad,",
+				"          VigenciaDesde = fecha_desde,",
+				"          VigenciaHasta = fecha_hasta,",
+				"          Estado = estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selxls2022",
+				"xls2023 select(mapColumn(",
+				"          VehiculoId = nro_bus,",
+				"          Placa = placa,",
+				"          TipoVehiculo = tipo_bus,",
+				"          CapacidadEfectiva = capacidad,",
+				"          VigenciaDesde = fecha_desde,",
+				"          VigenciaHasta = fecha_hasta,",
+				"          Estado = estado",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selxls2023",
+				"sql derive(VehiculoId = toString(VehiculoId),",
+				"          CapacidadEfectiva = toString(CapacidadEfectiva),",
+				"          VigenciaDesde = toString(VigenciaDesde),",
+				"          VigenciaHasta = toString(VigenciaHasta)) ~> txtsql",
+				"selxls2022 derive(VehiculoId = toString(VehiculoId),",
+				"          CapacidadEfectiva = toString(CapacidadEfectiva),",
+				"          VigenciaDesde = toString(VigenciaDesde),",
+				"          VigenciaHasta = toString(VigenciaHasta)) ~> txtxls2022",
+				"selxls2023 derive(VehiculoId = toString(VehiculoId),",
+				"          CapacidadEfectiva = toString(CapacidadEfectiva),",
+				"          VigenciaDesde = toString(VigenciaDesde),",
+				"          VigenciaHasta = toString(VigenciaHasta)) ~> txtxls2023",
+				"selcsv, txtsql, txtxls2022, txtxls2023 union(byName: true)~> unionVehiculos",
+				"unionVehiculos sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AnioFuente as string,",
+				"          VehiculoId as string,",
+				"          Placa as string,",
+				"          TipoVehiculo as string,",
+				"          CapacidadEfectiva as string,",
+				"          VigenciaDesde as string,",
+				"          VigenciaHasta as string,",
+				"          Estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkVehiculos"
 			]
 		}
 	}
