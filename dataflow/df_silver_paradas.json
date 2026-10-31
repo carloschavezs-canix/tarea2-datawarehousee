@@ -76,7 +76,7 @@
 				"     skipDuplicateMapOutputs: true,",
 				"     errorHandlingOption: 'allErrors',",
 				"     transactionCommit: 'single',",
-				"     reportSuccessOnError: false) ~> sinkSilverParadas"
+				"     reportSuccessOnError: true) ~> sinkSilverParadas"
 			]
 		}
 	}
