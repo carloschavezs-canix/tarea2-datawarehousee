@@ -1,0 +1,84 @@
+{
+	"name": "df_silver_paradas",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_dw_bronze_paradas",
+						"type": "DatasetReference"
+					},
+					"name": "bronze"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_dw_silver_paradas",
+						"type": "DatasetReference"
+					},
+					"name": "sinkSilverParadas"
+				}
+			],
+			"transformations": [
+				{
+					"name": "limpieza"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          AnioFuente as string,",
+				"          ParadaHistoricaId as string,",
+				"          CodigoPublicado as string,",
+				"          NombreParada as string,",
+				"          Zona as string,",
+				"          Latitud as string,",
+				"          Longitud as string,",
+				"          VigenciaDesde as string,",
+				"          VigenciaHasta as string,",
+				"          Estado as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     isolationLevel: 'READ_UNCOMMITTED',",
+				"     format: 'table') ~> bronze",
+				"bronze derive(ParadaHistoricaId = trim(ParadaHistoricaId),",
+				"          NombreParada = trim(NombreParada),",
+				"          Zona = upper(trim(Zona)),",
+				"          Estado = upper(trim(Estado)),",
+				"          Latitud = toDecimal(trim(Latitud),9,6),",
+				"          Longitud = toDecimal(trim(Longitud),9,6),",
+				"          VigenciaDesde = coalesce(toDate(left(trim(VigenciaDesde),10),'yyyy-MM-dd'), toDate(trim(VigenciaDesde),'dd/MM/yyyy')),",
+				"          VigenciaHasta = coalesce(toDate(left(trim(VigenciaHasta),10),'yyyy-MM-dd'), toDate(trim(VigenciaHasta),'dd/MM/yyyy')),",
+				"          AnioFuente = coalesce(toShort(trim(AnioFuente)), toShort(year(toDate(left(trim(VigenciaDesde),10),'yyyy-MM-dd')))),",
+				"          CodigoPublicado = coalesce(trim(CodigoPublicado), trim(ParadaHistoricaId))) ~> limpieza",
+				"limpieza sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          AnioFuente as integer,",
+				"          ParadaHistoricaId as string,",
+				"          CodigoPublicado as string,",
+				"          NombreParada as string,",
+				"          Zona as string,",
+				"          Latitud as decimal(9,6),",
+				"          Longitud as decimal(9,6),",
+				"          VigenciaDesde as date,",
+				"          VigenciaHasta as date,",
+				"          Estado as string",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     truncate:true,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'allErrors',",
+				"     transactionCommit: 'single',",
+				"     reportSuccessOnError: false) ~> sinkSilverParadas"
+			]
+		}
+	}
+}
