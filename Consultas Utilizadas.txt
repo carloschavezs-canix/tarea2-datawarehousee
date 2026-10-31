@@ -1,0 +1,48 @@
+-- =====================================================================
+-- CONSULTAS UTILIZADAS - Tarea 2 Datawarehouse Transporte (hasta Silver)
+-- Ejecutar en el Editor de consultas de Azure SQL.
+-- =====================================================================
+
+-- 1. Ver las tablas de la base ERP (conectado a erp_transporte_db)
+SELECT TABLE_SCHEMA, TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+ORDER BY 1, 2;
+
+-- 2. Ver las tablas creadas en el DW (conectado a dw_transporte)
+SELECT TABLE_SCHEMA, TABLE_NAME
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA IN ('bronze', 'silver')
+ORDER BY 1, 2;
+
+-- 3. Conteo de filas en BRONZE
+SELECT 'bronze.ParadasAzure'   AS tabla, COUNT(*) AS filas FROM bronze.ParadasAzure
+UNION ALL
+SELECT 'bronze.VehiculosAzure', COUNT(*) FROM bronze.VehiculosAzure;
+
+-- 4. Conteo de filas en SILVER
+SELECT 'silver.ParadasAzure'   AS tabla, COUNT(*) AS filas FROM silver.ParadasAzure
+UNION ALL
+SELECT 'silver.VehiculosAzure', COUNT(*) FROM silver.VehiculosAzure;
+
+-- 5. Comparar bronze vs silver (filas que quedaron despues de la limpieza)
+SELECT
+    (SELECT COUNT(*) FROM bronze.ParadasAzure)   AS bronze_paradas,
+    (SELECT COUNT(*) FROM silver.ParadasAzure)   AS silver_paradas,
+    (SELECT COUNT(*) FROM bronze.VehiculosAzure) AS bronze_vehiculos,
+    (SELECT COUNT(*) FROM silver.VehiculosAzure) AS silver_vehiculos;
+
+-- 6. Muestra de datos
+SELECT TOP 10 * FROM bronze.ParadasAzure;
+SELECT TOP 10 * FROM silver.ParadasAzure;
+SELECT TOP 10 * FROM bronze.VehiculosAzure;
+SELECT TOP 10 * FROM silver.VehiculosAzure;
+
+-- 7. Filas por anio en silver
+SELECT AnioFuente, COUNT(*) AS filas FROM silver.ParadasAzure   GROUP BY AnioFuente ORDER BY AnioFuente;
+SELECT AnioFuente, COUNT(*) AS filas FROM silver.VehiculosAzure GROUP BY AnioFuente ORDER BY AnioFuente;
+
+-- 8. No deben quedar duplicados en silver (resultado vacio)
+SELECT AnioFuente, ParadaHistoricaId, COUNT(*) FROM silver.ParadasAzure
+GROUP BY AnioFuente, ParadaHistoricaId HAVING COUNT(*) > 1;
+SELECT AnioFuente, VehiculoId, COUNT(*) FROM silver.VehiculosAzure
+GROUP BY AnioFuente, VehiculoId HAVING COUNT(*) > 1;
